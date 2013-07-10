@@ -1,7 +1,7 @@
 {
   "name": "grunt-ftpush",
   "description": "Incremenetal deployment over FTP",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/inossidabule/grunt-ftpush",
   "author": {
     "name": "Boris Staal",

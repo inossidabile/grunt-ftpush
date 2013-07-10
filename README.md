@@ -44,6 +44,10 @@ The parameters in our configuration are:
 - **exclusions** - an optional parameter allowing us to exclude files and folders by utilizing grunt's support for `minimatch`. Please note that the definitions should be relative to the project root
 - **keep** - an array of paths that should be kept on the server even when they are not presented locally. The definitions should be relative to `dest`.
 
+## Options
+
+The only possible option is: `--simple`. If given, task will upload modified files and quit, it will NOT remove redundant files and directories at the server side.
+
 ## Authentication parameters
 
 Usernames and passwords are stored as a JSON object in a file named `.ftppass`. This file should be located in the same folder as your `Gruntfile`. `.ftppass` should have the following format:

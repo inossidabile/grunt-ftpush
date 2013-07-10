@@ -20,6 +20,7 @@ module.exports = (grunt) ->
     credentials = if @data.auth.authKey then auth(@data.auth.authKey) else auth(@data.auth.host)
     exclusions  = @data.exclusions || []
     keep        = @data.keep || []
+    remove      = !grunt.option('simple')
 
     sync = new Synchronizer(
       localRoot,
@@ -27,7 +28,8 @@ module.exports = (grunt) ->
       ".grunt/ftpush/#{@target}.json",
       Object.merge(@data.auth, credentials),
       exclusions,
-      keep
+      keep,
+      remove
     )
 
     sync.sync -> done()
@@ -37,7 +39,7 @@ module.exports = (grunt) ->
 
   class Synchronizer
 
-    constructor: (@localRoot, @remoteRoot, @memoryPath, @auth, @exclusions, @keep) ->
+    constructor: (@localRoot, @remoteRoot, @memoryPath, @auth, @exclusions, @keep, @remove) ->
       @localFiles = @buildTree()
 
       @ftp = new FTP
@@ -63,20 +65,32 @@ module.exports = (grunt) ->
         callback()
 
     sync: (callback) ->
-      diffs = 0
+      finish = (err) =>
+        grunt.warn err if err
+        @ftp.raw.quit ->
+          callback()
 
       @prepare =>
-        diff = (path, callback) =>
-          @diff path, (diff) =>
-            @perform path, diff, ->
-              callback()
+        if @remove
+          diff = (path, done) =>
+            @diff path, (diff) =>
+              @perform path, diff, ->
+                done()
 
-        async.each Object.keys(@localFiles), diff, (err) =>
-          grunt.warn err if err
-          # This is here to workaround weir jsftp bug that
-          # does not upload the last file
-          @ftp.raw.quit ->
-            callback()
+          async.each Object.keys(@localFiles), diff, finish
+        else
+          commands = []
+          files    = @findLocallyModified()
+
+          upload = (path, done) =>
+            @ftp.raw.mkd Path.join(@remoteRoot, path), =>
+              files[path].each (file) =>
+                commands.push (done) =>
+                  @upload file.name, path, file.time, done
+              done()
+
+          async.each Object.keys(files), upload, =>
+            async.parallel commands, finish
 
     perform: (path, diff, callback) ->
       commands = []
@@ -117,6 +131,17 @@ module.exports = (grunt) ->
               time: FS.statSync(current).mtime.getTime()
 
       result
+
+    findLocallyModified: ->
+      changed = {}
+
+      Object.each @localFiles, (path, files) =>
+        for file in files
+          if file.time != @memory[path]?[file.name]
+            changed[path] ||= []
+            changed[path].push file
+
+      changed
 
     diff: (path, callback) ->
       localFiles = @localFiles[path]
