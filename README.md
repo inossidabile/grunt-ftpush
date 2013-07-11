@@ -8,6 +8,8 @@ This is a [grunt](https://github.com/gruntjs/grunt) task for code deployment ove
   * If there are two users that deploy (or you use multiple machines), it will increment _all_ local changes. It can be considered safe but you might end up uploading a bit more.
   * To make it reupload from the scratch, delete files located at `.grunt/ftpush/*`.
 
+[![endorse](http://api.coderwall.com/inossidabile/endorsecount.png)](http://coderwall.com/inossidabile)
+
 ## Usage
 
 To use this task you will need to include the following configuration in your _grunt_ file:
