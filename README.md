@@ -74,3 +74,11 @@ This way we can save as many username / password combinations as we want and loo
 This task is a fork of [grunt-ftp-deploy](https://github.com/zonak/grunt-ftp-deploy) by [zonak](https://github.com/zonak).
 
 It also is built by taking advantage of the great work of Sergi Mansilla and his [jsftp](https://github.com/sergi/jsftp) _node.js_ module and suited for the **0.4.x** branch of _grunt_.
+
+## Maintainers
+
+* Boris Staal, [@inossidabile](http://staal.io)
+
+## License
+
+It is free software, and may be redistributed under the terms of MIT license.
