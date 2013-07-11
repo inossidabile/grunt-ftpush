@@ -69,7 +69,7 @@ This way we can save as many username / password combinations as we want and loo
 
 **IMPORTANT**: make sure that the `.ftppass` file uses double quotes (which is the proper _JSON_ syntax) instead of single quotes for the names of the keys and the string values.
 
-## Dependencies
+## Kudos
 
 This task is a fork of [grunt-ftp-deploy](https://github.com/zonak/grunt-ftp-deploy) by [zonak](https://github.com/zonak).
 
