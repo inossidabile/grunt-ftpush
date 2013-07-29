@@ -6,6 +6,7 @@ module.exports = (grunt) ->
   FS     = require 'fs'
   FTP    = require 'jsftp'
   async  = require 'async'
+  util   = require 'util'
 
   grunt.registerMultiTask "ftpush", "Mirror code over FTP", (target) ->
     done = @async()
@@ -39,14 +40,14 @@ module.exports = (grunt) ->
 
   class Synchronizer
 
+    debug: false
+
     constructor: (@localRoot, @remoteRoot, @memoryPath, @auth, @exclusions, @keep, @remove) ->
       @localFiles = @buildTree()
 
       @ftp = new FTP
         host: @auth.host
         port: @auth.port
-
-      @ftp.useList = true
 
       @memory = if grunt.file.exists(@memoryPath)
         JSON.parse grunt.file.read(@memoryPath)
@@ -122,6 +123,7 @@ module.exports = (grunt) ->
         unless grunt.file.isMatch(@exclusions, current)
           if grunt.file.isDir current
             nestedRoot = Path.join(root, file)
+            Path.relative @localRoot, nestedRoot
             result[Path.sep + Path.relative @localRoot, nestedRoot] ||= []
             @buildTree(nestedRoot, result)
           else
@@ -167,12 +169,15 @@ module.exports = (grunt) ->
           diff.upload.push [lf.name, lf.time] if !rf || lf.time != @memory[path]?[lf.name]
 
         grunt.log.ok "Got diff for #{path.yellow} #{diff.upload.length.toString().green} #{diff.rm.length.toString().red} #{diff.rmDir.length.toString().cyan}"
+        grunt.log.debug "Diff", util.inspect(diff)
         callback(diff)
 
     touch: (path, callback) ->
+      grunt.log.debug "Touch", util.inspect(path)
       @ftp.ls Path.join(path, '*'), (err, results) =>
         return callback(results.compact()) unless err
 
+        grunt.log.debug "Make directory", util.inspect(path)
         @ftp.raw.mkd path, (err) =>
           if err
             grunt.warn "Error creating new remote folder " + path + " --> " + err
@@ -181,6 +186,7 @@ module.exports = (grunt) ->
             callback([])
     
     upload: (basename, path, mtime, callback) ->
+      grunt.log.debug "Upload", util.inspect(basename), util.inspect(path), util.inspect(mtime)
       remoteFile = Path.join(@remoteRoot, path, basename)
 
       @ftp.put remoteFile, FS.readFileSync(Path.join @localRoot, path, basename), (err) =>
@@ -192,6 +198,7 @@ module.exports = (grunt) ->
           callback()
 
     rm: (basename, path, callback) ->
+      grunt.log.debug "Delete", util.inspect(basename), util.inspect(path)
       @ftp.raw.dele Path.join(@remoteRoot, path, basename), (err) ->
         if err
           grunt.warn "Cannot delete file: " + basename + " --> " + err
@@ -200,6 +207,7 @@ module.exports = (grunt) ->
           callback()
 
     rmDir: (basename, path, callback) ->
+      grunt.log.debug "Delete directory", util.inspect(basename), util.inspect(path)
       remotePath = Path.join @remoteRoot, path, basename
 
       @ftp.ls remotePath, (err, results) =>
