@@ -43,6 +43,7 @@ module.exports = (grunt) ->
     debug: false
 
     constructor: (@localRoot, @remoteRoot, @memoryPath, @auth, @exclusions, @keep, @remove) ->
+      @localRoot  = Path.resolve(@localRoot)
       @localFiles = @buildTree()
 
       @ftp = new FTP
@@ -155,6 +156,8 @@ module.exports = (grunt) ->
           rmDir:  []
 
         remoteFiles.each (rf) =>
+          rf.name = Path.basename(rf.name)
+
           unless grunt.file.isMatch(@keep, Path.join(path, rf.name))
             # File
             if rf.type == 0
