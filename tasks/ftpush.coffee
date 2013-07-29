@@ -178,7 +178,7 @@ module.exports = (grunt) ->
     touch: (path, callback) ->
       grunt.log.debug "Touch", util.inspect(path)
       @ftp.ls path, (err, results) =>
-        return callback(results.compact()) if !err && results.length > 0
+        return callback(results.compact()) if !err && results?.length? && results.length > 0
 
         if err
           grunt.warn "Error listing remote folder " + path + " --> " + err
