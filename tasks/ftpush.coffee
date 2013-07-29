@@ -177,16 +177,21 @@ module.exports = (grunt) ->
 
     touch: (path, callback) ->
       grunt.log.debug "Touch", util.inspect(path)
-      @ftp.ls Path.join(path, '*'), (err, results) =>
-        return callback(results.compact()) unless err
+      @ftp.ls path, (err, results) =>
+        return callback(results.compact()) if results.length > 0
+
+        if err
+          grunt.warn "Error listing remote folder " + path + " --> " + err
 
         grunt.log.debug "Make directory", util.inspect(path)
+
         @ftp.raw.mkd path, (err) =>
           if err
-            grunt.warn "Error creating new remote folder " + path + " --> " + err
+            grunt.log.ok "Remote folder wasn't creted (is empty?) " + path + " --> " + err
           else
             grunt.log.ok "New remote folder created " + path.yellow
-            callback([])
+
+          callback([])
     
     upload: (basename, path, mtime, callback) ->
       grunt.log.debug "Upload", util.inspect(basename), util.inspect(path), util.inspect(mtime)
