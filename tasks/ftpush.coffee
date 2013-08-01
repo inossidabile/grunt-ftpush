@@ -7,6 +7,7 @@ module.exports = (grunt) ->
   FTP    = require 'jsftp'
   async  = require 'async'
   util   = require 'util'
+  crypto = require 'crypto'
 
   grunt.registerMultiTask "ftpush", "Mirror code over FTP", (target) ->
     done = @async()
@@ -55,9 +56,14 @@ module.exports = (grunt) ->
       else
         {}
 
-    remember: (path, file, mtime) ->
+    hash: (path) ->
+      hash = crypto.createHash 'md5'
+      hash.update grunt.file.read(path)
+      hash.digest 'hex'
+
+    remember: (path, file, hash) ->
       @memory[path] ||= {}
-      @memory[path][file] = mtime
+      @memory[path][file] = hash
       grunt.file.write @memoryPath, JSON.stringify(@memory)
 
     prepare: (callback) ->
@@ -88,7 +94,7 @@ module.exports = (grunt) ->
             @ftp.raw.mkd Path.join(@remoteRoot, path), =>
               files[path].each (file) =>
                 commands.push (done) =>
-                  @upload file.name, path, file.time, done
+                  @upload file.name, path, file.hash, done
               done()
 
           async.each Object.keys(files), upload, =>
@@ -131,7 +137,7 @@ module.exports = (grunt) ->
             nestedRoot = Path.relative(@localRoot, root)
             result[Path.sep + nestedRoot].push
               name: file
-              time: FS.statSync(current).mtime.getTime()
+              hash: @hash(current)
 
       result
 
@@ -140,7 +146,7 @@ module.exports = (grunt) ->
 
       Object.each @localFiles, (path, files) =>
         for file in files
-          if file.time != @memory[path]?[file.name]
+          if file.hash != @memory[path]?[file.name]
             changed[path] ||= []
             changed[path].push file
 
@@ -169,7 +175,7 @@ module.exports = (grunt) ->
 
         localFiles.each (lf) =>
           rf = remoteFiles.find (x) -> lf.name == x.name
-          diff.upload.push [lf.name, lf.time] if !rf || lf.time != @memory[path]?[lf.name]
+          diff.upload.push [lf.name, lf.hash] if !rf || lf.hash != @memory[path]?[lf.name]
 
         grunt.log.ok "Got diff for #{path.yellow} #{diff.upload.length.toString().green} #{diff.rm.length.toString().red} #{diff.rmDir.length.toString().cyan}"
         grunt.log.debug "Diff", util.inspect(diff)
@@ -193,15 +199,15 @@ module.exports = (grunt) ->
 
           callback([])
     
-    upload: (basename, path, mtime, callback) ->
-      grunt.log.debug "Upload", util.inspect(basename), util.inspect(path), util.inspect(mtime)
+    upload: (basename, path, hash, callback) ->
+      grunt.log.debug "Upload", util.inspect(basename), util.inspect(path), util.inspect(hash)
       remoteFile = Path.join(@remoteRoot, path, basename)
 
       @ftp.put remoteFile, FS.readFileSync(Path.join @localRoot, path, basename), (err) =>
         if err
           grunt.warn "Cannot upload file: " + basename + " --> " + err
         else
-          @remember path, basename, mtime
+          @remember path, basename, hash
           grunt.log.ok "Uploaded file: " + basename.green + " to: " + path.yellow
           callback()
 
