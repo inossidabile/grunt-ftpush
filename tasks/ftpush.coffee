@@ -186,14 +186,11 @@ module.exports = (grunt) ->
       @ftp.ls path, (err, results) =>
         return callback(results.compact()) if !err && results?.length? && results.length > 0
 
-        if err
-          grunt.warn "Error listing remote folder " + path + " --> " + err
-
         grunt.log.debug "Make directory", util.inspect(path)
 
         @ftp.raw.mkd path, (err) =>
           if err
-            grunt.log.ok "Remote folder wasn't creted (is empty?) " + path + " --> " + err
+            grunt.log.debug "Remote folder wasn't creted (isn't empty?) " + path + " --> " + err
           else
             grunt.log.ok "New remote folder created " + path.yellow
 
