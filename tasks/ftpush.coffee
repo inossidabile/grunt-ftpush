@@ -1,13 +1,13 @@
+require 'sugar'
+
+Path   = require 'path'
+FS     = require 'fs'
+FTP    = require 'jsftp'
+async  = require 'async'
+util   = require 'util'
+crypto = require 'crypto'
+
 module.exports = (grunt) ->
-
-  require 'sugar'
-
-  Path   = require 'path'
-  FS     = require 'fs'
-  FTP    = require 'jsftp'
-  async  = require 'async'
-  util   = require 'util'
-  crypto = require 'crypto'
 
   grunt.registerMultiTask "ftpush", "Mirror code over FTP", (target) ->
     done = @async()
@@ -36,7 +36,7 @@ module.exports = (grunt) ->
 
     sync.sync -> done()
 
-    false  if grunt.errors
+    false if grunt.errors
 
 
   class Synchronizer
@@ -68,7 +68,7 @@ module.exports = (grunt) ->
 
     prepare: (callback) ->
       @ftp.auth @auth.username, @auth.password, (err) =>
-        grunt.warn "Authentication " + err  if err
+        grunt.fatal "Authentication " + err  if err
         grunt.log.ok "Authenticated as #{@auth.username}"
         callback()
 
