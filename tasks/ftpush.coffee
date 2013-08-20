@@ -24,7 +24,9 @@ module.exports = (grunt) ->
     credentials = if @data.auth.authKey then auth(@data.auth.authKey) else auth(@data.auth.host)
     exclusions  = @data.exclusions || []
     keep        = @data.keep || []
-    remove      = !grunt.option('simple')
+    options     =
+      useList: !!@data.useList
+      remove:  !grunt.option('simple')
 
     grunt.log.debug "Initializing synchronizer..."
 
@@ -35,7 +37,7 @@ module.exports = (grunt) ->
       Object.merge(@data.auth, credentials),
       exclusions,
       keep,
-      remove
+      options
     )
 
     grunt.log.debug "Synchronizer initialized..."
@@ -46,16 +48,19 @@ module.exports = (grunt) ->
 
     debug: false
 
-    constructor: (@localRoot, @remoteRoot, @memoryPath, @auth, @exclusions, @keep, @remove) ->
+    constructor: (@localRoot, @remoteRoot, @memoryPath, @auth, @exclusions, @keep, options) ->
       @localRoot = Path.resolve(@localRoot)
       grunt.log.debug "Local root set to '#{@localRoot}'"
 
       @localFiles = @buildTree()
       grunt.log.debug "#{Object.keys(@localFiles).length} paths found"
 
+      @remove = options.remove
+
       @ftp = new FTP
         host: @auth.host
         port: @auth.port
+      @ftp.useList = options.useList
 
       @memory = if grunt.file.exists(@memoryPath)
         JSON.parse grunt.file.read(@memoryPath)
