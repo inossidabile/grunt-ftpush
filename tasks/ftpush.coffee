@@ -68,11 +68,13 @@ module.exports = (grunt) ->
 
     prepare: (callback) ->
       @ftp.auth @auth.username, @auth.password, (err) =>
-        grunt.fatal "Authentication " + err  if err
+        grunt.fatal "Authentication error: #{err}" if err
         grunt.log.ok "Authenticated as #{@auth.username}"
         callback()
 
     sync: (callback) ->
+      grunt.log.debug "Uploading started from #{@localRoot} for #{@localFiles.length} files..."
+
       finish = (err) =>
         grunt.warn err if err
         @ftp.raw.quit ->
@@ -80,6 +82,8 @@ module.exports = (grunt) ->
 
       @prepare =>
         if @remove
+          grunt.log.debug "Switching to full synchronization mode..."
+
           diff = (path, done) =>
             @diff path, (diff) =>
               @perform path, diff, ->
@@ -87,6 +91,8 @@ module.exports = (grunt) ->
 
           async.each Object.keys(@localFiles), diff, finish
         else
+          grunt.log.debug "Switching to simple mode..."
+
           commands = []
           files    = @findLocallyModified()
 
