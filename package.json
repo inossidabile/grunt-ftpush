@@ -1,18 +1,18 @@
 {
   "name": "grunt-ftpush",
-  "description": "Incremenetal deployment over FTP",
-  "version": "0.2.1",
-  "homepage": "https://github.com/inossidabile/grunt-ftpush",
+  "description": "Package has been renamed to 'grunt-contrib-ftpush'!",
+  "version": "0.2.2",
+  "homepage": "https://github.com/inossidabile/grunt-contrib-ftpush",
   "author": {
     "name": "Boris Staal",
     "email": "boris@staal.io"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/inossidabile/grunt-ftpush.git"
+    "url": "git://github.com/inossidabile/grunt-contrib-ftpush.git"
   },
   "bugs": {
-    "url": "https://github.com/inossidabile/grunt-ftpush/issues"
+    "url": "https://github.com/inossidabile/grunt-contrib-ftpush/issues"
   },
   "engines": {
     "node": "*"
