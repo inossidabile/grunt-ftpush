@@ -1,6 +1,6 @@
 {
-  "name": "grunt-ftpush",
-  "description": "Package has been renamed to 'grunt-contrib-ftpush'!",
+  "name": "grunt-contrib-ftpush",
+  "description": "Incrementally deploy data over the FTP protocol",
   "version": "0.2.2",
   "homepage": "https://github.com/inossidabile/grunt-contrib-ftpush",
   "author": {
