@@ -51,7 +51,7 @@ module.exports = (grunt) ->
       grunt.log.debug "Local root set to '#{@localRoot}'"
 
       @localFiles = @buildTree()
-      grunt.log.debug "#{@localFiles.length} files found"
+      grunt.log.debug "#{Object.keys(@localFiles).length} paths found"
 
       @ftp = new FTP
         host: @auth.host
@@ -130,25 +130,26 @@ module.exports = (grunt) ->
       async.parallel commands, ->
         callback()
 
-    buildTree: ->
-      unless grunt.file.exists(@localRoot)
-        grunt.fatal "#{@localRoot} is not an existing location"  
+    buildTree: (root=@localRoot, result={}) ->
+      result[Path.sep] ||= []
+      
+      unless grunt.file.exists(root)
+        grunt.fatal "#{root} is not an existing location"  
+      
+      for filename in FS.readdirSync(root)
+        path = Path.join(root, filename)
 
-      result = {}
-      result[Path.sep] = []
-
-      grunt.file.recurse @localRoot, (path, root, subdir='', filename) =>
-        grunt.log.debug "#{path} added to local tree"
-
-        result[Path.sep + subdir] ||= []  
-        result[Path.sep + subdir].push
-          name: filename
-          hash: @hash(path)
-
-        # Ensuring all the pathes down to root have entries at the result
-        while subdir = Path.dirname(subdir)
-          break if subdir == '.'
-          result[Path.sep + subdir] ||= []
+        unless grunt.file.isMatch(@exclusions, path)
+          if grunt.file.isDir path
+            grunt.log.debug "Building tree: Recursing into #{path}"
+            result[Path.sep + Path.relative(@localRoot, path)] ||= []
+            @buildTree(path, result)
+          else
+            grunt.log.debug "Building tree: Added #{path}"
+            subdir = Path.relative(@localRoot, root)
+            result[Path.sep + subdir].push
+              name: filename
+              hash: @hash(path)
 
       result
 
