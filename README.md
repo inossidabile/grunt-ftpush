@@ -1,6 +1,12 @@
-# grunt-ftpush
+# grunt-contrib-ftpush
 
-This is a [grunt](https://github.com/gruntjs/grunt) task for code deployment over the _ftp_ protocol. Being rewrite of [grunt-ftp-deploy](https://github.com/zonak/grunt-ftp-deploy) it works incrementally unlike its predecessor. It mirrors remote location to the given local location removing excess directories and files. Additionally it tries to intellectually upload only changed files.
+[![NPM version](https://badge.fury.io/js/grunt-contrib-ftpush.png)](http://badge.fury.io/js/grunt-contrib-ftpush)
+
+> Incrementally deploy data over the FTP protocol.
+>
+> Being rewrite of [grunt-ftp-deploy](https://github.com/zonak/grunt-ftp-deploy) it works incrementally
+> unlike its predecessor. It mirrors remote location to the given local location removing excess directories
+> and files. Additionally it tries to intellectually upload only changed files.
 
 **NOTE**: with the limited abilities of FTP, the only adequate way to track changes is to track them locally. It means that each run will compare set of files **to the previous run** and not the server state. Therefore:
 
@@ -8,11 +14,24 @@ This is a [grunt](https://github.com/gruntjs/grunt) task for code deployment ove
   * If there are two users that deploy (or you use multiple machines), it will increment _all_ local changes. It can be considered safe but you might end up uploading a bit more.
   * To make it reupload from the scratch, delete files located at `.grunt/ftpush/*`.
 
-[![endorse](http://api.coderwall.com/inossidabile/endorsecount.png)](http://coderwall.com/inossidabile)
+## Getting Started
+This plugin requires Grunt `~0.4.0`
 
-## Usage
+If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
-To use this task you will need to include the following configuration in your _grunt_ file:
+```shell
+npm install grunt-contrib-testem --save-dev
+```
+
+Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
+
+```js
+grunt.loadNpmTasks('grunt-contrib-testem');
+```
+
+## How to use
+
+Within your Grunt configuration you have to define one or more bundles to upload:
 
 ```javascript
 ftpush: {
@@ -30,13 +49,7 @@ ftpush: {
 }
 ```
 
-and load the task:
-
-```javascript
-grunt.loadNpmTasks('grunt-ftpush');
-```
-
-The parameters in our configuration are:
+The possible parameters of the configuration are:
 
 - **host** - the name or the IP address of the server we are deploying to
 - **port** - the port that the _ftp_ service is running on
