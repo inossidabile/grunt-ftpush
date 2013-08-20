@@ -31,7 +31,7 @@ module.exports = (grunt) ->
     sync = new Synchronizer(
       localRoot,
       remoteRoot,
-      ".grunt/ftpush/#{@target}.json",
+      Path.join(".grunt", "ftpush", "#{@target}.json"),
       Object.merge(@data.auth, credentials),
       exclusions,
       keep,
@@ -130,26 +130,23 @@ module.exports = (grunt) ->
       async.parallel commands, ->
         callback()
 
-    buildTree: (root=@localRoot, result={}) ->
-      result[Path.sep] ||= []
-      
-      unless grunt.file.exists(root)
-        grunt.warn "#{root} is not an existing location"  
-      
-      for file in FS.readdirSync(root)
-        current = Path.join(root, file)
+    buildTree: ->
+      unless grunt.file.exists(@localRoot)
+        grunt.fatal "#{@localRoot} is not an existing location"  
 
-        unless grunt.file.isMatch(@exclusions, current)
-          if grunt.file.isDir current
-            nestedRoot = Path.join(root, file)
-            Path.relative @localRoot, nestedRoot
-            result[Path.sep + Path.relative @localRoot, nestedRoot] ||= []
-            @buildTree(nestedRoot, result)
-          else
-            nestedRoot = Path.relative(@localRoot, root)
-            result[Path.sep + nestedRoot].push
-              name: file
-              hash: @hash(current)
+      result = {}
+      result[Path.sep] = []
+
+      grunt.file.recurse @localRoot, (path, root, subdir='', filename) =>
+        result[Path.sep + subdir] ||= []  
+        result[Path.sep + subdir].push
+          name: filename
+          hash: @hash(path)
+
+        # Ensuring all the path down to root has entris at the result
+        while subdir = Path.dirname(subdir)
+          break if subdir == '.'
+          result[Path.sep + subdir] ||= []
 
       result
 
