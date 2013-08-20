@@ -138,6 +138,8 @@ module.exports = (grunt) ->
       result[Path.sep] = []
 
       grunt.file.recurse @localRoot, (path, root, subdir='', filename) =>
+        grunt.log.debug "#{path} added to local tree"
+
         result[Path.sep + subdir] ||= []  
         result[Path.sep + subdir].push
           name: filename
