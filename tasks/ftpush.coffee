@@ -17,12 +17,16 @@ module.exports = (grunt) ->
         config = grunt.file.read(".ftppass")
         return JSON.parse(config)[key] if key? and config.length
 
+    grunt.log.debug "Collecting information..."
+
     localRoot   = if Array.isArray(@data.src) then @data.src[0] else @data.src
     remoteRoot  = if Array.isArray(@data.dest) then @data.dest[0] else @data.dest
     credentials = if @data.auth.authKey then auth(@data.auth.authKey) else auth(@data.auth.host)
     exclusions  = @data.exclusions || []
     keep        = @data.keep || []
     remove      = !grunt.option('simple')
+
+    grunt.log.debug "Initializing synchronizer..."
 
     sync = new Synchronizer(
       localRoot,
@@ -34,18 +38,20 @@ module.exports = (grunt) ->
       remove
     )
 
-    sync.sync -> done()
+    grunt.log.debug "Synchronizer initialized..."
 
-    false if grunt.errors
-
+    sync.sync done
 
   class Synchronizer
 
     debug: false
 
     constructor: (@localRoot, @remoteRoot, @memoryPath, @auth, @exclusions, @keep, @remove) ->
-      @localRoot  = Path.resolve(@localRoot)
+      @localRoot = Path.resolve(@localRoot)
+      grunt.log.debug "Local root set to '#{@localRoot}'"
+
       @localFiles = @buildTree()
+      grunt.log.debug "#{@localFiles.length} files found"
 
       @ftp = new FTP
         host: @auth.host
@@ -73,7 +79,7 @@ module.exports = (grunt) ->
         callback()
 
     sync: (callback) ->
-      grunt.log.debug "Uploading started from #{@localRoot} for #{@localFiles.length} files..."
+      grunt.log.debug "Uploading started..."
 
       finish = (err) =>
         grunt.warn err if err
