@@ -143,7 +143,7 @@ module.exports = (grunt) ->
           name: filename
           hash: @hash(path)
 
-        # Ensuring all the path down to root has entris at the result
+        # Ensuring all the pathes down to root have entries at the result
         while subdir = Path.dirname(subdir)
           break if subdir == '.'
           result[Path.sep + subdir] ||= []
