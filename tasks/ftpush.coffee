@@ -142,17 +142,16 @@ module.exports = (grunt) ->
         grunt.fatal "#{root} is not an existing location"  
       
       for filename in FS.readdirSync(root)
-        path   = Path.join(root, filename)
-        subdir = Path.relative(@localRoot, root)
+        path = Path.join(root, filename)
 
-        unless grunt.file.isMatch(@exclusions, Path.join(subdir, filename))
+        unless grunt.file.isMatch({matchBase: true}, @exclusions, path)
           if grunt.file.isDir path
             grunt.log.debug "Building tree: Recursing into #{path}"
             result[Path.sep + Path.relative(@localRoot, path)] ||= []
             @buildTree(path, result)
           else
             grunt.log.debug "Building tree: Added #{path}"
-            result[Path.sep + subdir].push
+            result[Path.sep + Path.relative(@localRoot, root)].push
               name: filename
               hash: @hash(path)
 
@@ -181,7 +180,7 @@ module.exports = (grunt) ->
         remoteFiles.each (rf) =>
           rf.name = Path.basename(rf.name)
 
-          unless grunt.file.isMatch(@keep, Path.join(path, rf.name))
+          unless grunt.file.isMatch({matchBase: true}, @keep, Path.join(path, rf.name))
             # File
             if rf.type == 0
               lf = localFiles.find (x) -> rf.name == x.name
