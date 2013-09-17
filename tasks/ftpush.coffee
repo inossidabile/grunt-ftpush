@@ -67,6 +67,12 @@ module.exports = (grunt) ->
       else
         {}
 
+    replaceSep: (path) -> path.split(Path.sep).join('/')
+
+    pathJoin: (parts...) ->
+      @replaceSep(Path.join.apply(null, parts))
+      
+
     hash: (path) ->
       hash = crypto.createHash 'md5'
       hash.update grunt.file.read(path)
@@ -198,6 +204,7 @@ module.exports = (grunt) ->
         callback(diff)
 
     touch: (path, callback) ->
+      path = @replaceSep(path)
       grunt.log.debug "Touch", util.inspect(path)
       @ftp.ls path, (err, results) =>
         return callback(results.compact()) if !err && results?.length? && results.length > 0
@@ -213,8 +220,10 @@ module.exports = (grunt) ->
           callback([])
     
     upload: (basename, path, hash, callback) ->
+      path = @replaceSep(path)
+
       grunt.log.debug "Upload", util.inspect(basename), util.inspect(path), util.inspect(hash)
-      remoteFile = Path.join(@remoteRoot, path, basename)
+      remoteFile = @pathJoin @remoteRoot, path, basename
 
       @ftp.put remoteFile, FS.readFileSync(Path.join @localRoot, path, basename), (err) =>
         if err
@@ -225,8 +234,10 @@ module.exports = (grunt) ->
           callback()
 
     rm: (basename, path, callback) ->
+      path = @replaceSep(path)
+
       grunt.log.debug "Delete", util.inspect(basename), util.inspect(path)
-      @ftp.raw.dele Path.join(@remoteRoot, path, basename), (err) ->
+      @ftp.raw.dele @pathJoin(@remoteRoot, path, basename), (err) ->
         if err
           grunt.warn "Cannot delete file: " + basename + " --> " + err
         else
@@ -234,8 +245,10 @@ module.exports = (grunt) ->
           callback()
 
     rmDir: (basename, path, callback) ->
+      path = @replaceSep(path)
+
       grunt.log.debug "Delete directory", util.inspect(basename), util.inspect(path)
-      remotePath = Path.join @remoteRoot, path, basename
+      remotePath = @pathJoin @remoteRoot, path, basename
 
       @ftp.ls remotePath, (err, results) =>
         grunt.warn "Cannot list directory #{remotePath} for removal --> #{err}" if err
