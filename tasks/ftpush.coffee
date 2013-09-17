@@ -26,7 +26,7 @@ module.exports = (grunt) ->
     keep        = @data.keep || []
     options     =
       useList: !!@data.useList
-      remove:  !grunt.option('simple')
+      remove:  !(grunt.option('simple') || @data.simple)
 
     grunt.log.debug "Initializing synchronizer..."
 

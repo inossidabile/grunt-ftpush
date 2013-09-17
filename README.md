@@ -14,6 +14,16 @@
   * If there are two users that deploy (or you use multiple machines), it will increment _all_ local changes. It can be considered safe but you might end up uploading a bit more.
   * To make it reupload from the scratch, delete files located at `.grunt/ftpush/*`.
 
+## ATTENTION
+
+This plugin is based on `jsftp` which may sometimes be pretty unstable. I will try hard to help you but its behavior may differ depending on the FTP server you connect to and I can't test them all.
+
+**Please consider the constant usage of `--simple` mode before raising an issue.**
+
+In this mode ftpush won't delete any excessive files on the server. It won't even try to list what's on the server. Instead it will just make incremental upload of files that actually changed (which is probably the main thing you want).
+
+If it works for you – add `simple: true` to your config and that's it!
+
 ## Getting Started
 This plugin requires Grunt `~0.4.0`
 
@@ -58,6 +68,7 @@ The possible parameters of the configuration are:
 - **dest** - the destination location, the folder on the server we are deploying to
 - **exclusions** - an optional parameter allowing us to exclude files and folders by utilizing grunt's support for `minimatch`. Please note that the definitions should be relative to the project root
 - **keep** - an array of paths that should be kept on the server even when they are not presented locally. The definitions should be relative to `dest`.
+- **simple** - if set to `true`, task will upload modified files and quit, it will NOT remove redundant files and directories at the server side.
 
 ## Options
 
