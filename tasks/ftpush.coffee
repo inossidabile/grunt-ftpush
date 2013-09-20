@@ -147,7 +147,7 @@ module.exports = (grunt) ->
       for filename in FS.readdirSync(root)
         path = Path.join(root, filename)
 
-        unless grunt.file.isMatch({matchBase: true}, @exclusions, path)
+        unless grunt.file.isMatch({matchBase: true}, @exclusions, Path.relative(@localRoot, path))
           if grunt.file.isDir path
             grunt.log.debug "Building tree: Recursing into #{path}"
             result[Path.sep + Path.relative(@localRoot, path)] ||= []
