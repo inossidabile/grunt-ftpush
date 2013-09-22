@@ -1,7 +1,7 @@
 {
   "name": "grunt-contrib-ftpush",
   "description": "Incrementally deploy data over the FTP protocol",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "homepage": "https://github.com/inossidabile/grunt-contrib-ftpush",
   "author": {
     "name": "Boris Staal",
