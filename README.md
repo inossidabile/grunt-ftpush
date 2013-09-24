@@ -53,7 +53,7 @@ ftpush: {
     },
     src: 'path/to/source/folder',
     dest: '/path/to/destination/folder',
-    exclusions: ['path/to/source/folder/**/.DS_Store', 'path/to/source/folder/**/Thumbs.db', 'dist/tmp']
+    exclusions: ['path/to/source/folder/**/.DS_Store', 'path/to/source/folder/**/Thumbs.db', 'dist/tmp'],
     keep: ['/important/images/at/server/*.jpg']
   }
 }
