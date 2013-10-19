@@ -1,6 +1,7 @@
 # grunt-ftpush
 
 [![NPM version](https://badge.fury.io/js/grunt-ftpush.png)](http://badge.fury.io/js/grunt-ftpush)
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/inossidabile/grunt-ftpush/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 > Incrementally deploy data over the FTP protocol.
 >
