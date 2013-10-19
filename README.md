@@ -1,7 +1,6 @@
 # grunt-ftpush
 
 [![NPM version](https://badge.fury.io/js/grunt-ftpush.png)](http://badge.fury.io/js/grunt-ftpush)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/inossidabile/grunt-ftpush/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 > Incrementally deploy data over the FTP protocol.
 >
@@ -109,3 +108,5 @@ It also is built by taking advantage of the great work of Sergi Mansilla and his
 ## License
 
 It is free software, and may be redistributed under the terms of MIT license.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/inossidabile/grunt-ftpush/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
