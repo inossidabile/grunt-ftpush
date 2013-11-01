@@ -111,7 +111,7 @@ module.exports = (grunt) ->
           files    = @findLocallyModified()
 
           upload = (path, done) =>
-            @ftp.raw.mkd Path.join(@remoteRoot, path), =>
+            @ftp.raw.mkd @normalizeFtpPath(Path.join(@remoteRoot, path)), =>
               files[path].each (file) =>
                 commands.push (done) =>
                   @upload file.name, path, file.hash, done
