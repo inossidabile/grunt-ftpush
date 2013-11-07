@@ -111,7 +111,14 @@ module.exports = (grunt) ->
           files    = @findLocallyModified()
 
           upload = (path, done) =>
-            @ftp.raw.mkd @normalizeFtpPath(Path.join(@remoteRoot, path)), =>
+            grunt.log.debug "Make directory", util.inspect(path)
+            
+            @ftp.raw.mkd @normalizeFtpPath(Path.join(@remoteRoot, path)), (err) =>
+              if err
+                grunt.log.debug "Remote folder wasn't creted (isn't empty?) " + path + " --> " + err
+              else
+                grunt.log.ok "New remote folder created " + path.yellow
+
               files[path].each (file) =>
                 commands.push (done) =>
                   @upload file.name, path, file.hash, done
