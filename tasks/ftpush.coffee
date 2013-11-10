@@ -111,14 +111,7 @@ module.exports = (grunt) ->
           files    = @findLocallyModified()
 
           upload = (path, done) =>
-            grunt.log.debug "Make directory", util.inspect(path)
-            
-            @ftp.raw.mkd @normalizeFtpPath(Path.join(@remoteRoot, path)), (err) =>
-              if err
-                grunt.log.debug "Remote folder wasn't creted (isn't empty?) " + path + " --> " + err
-              else
-                grunt.log.ok "New remote folder created " + path.yellow
-
+            @touchRecursive Path.join(@remoteRoot, path), =>
               files[path].each (file) =>
                 commands.push (done) =>
                   @upload file.name, path, file.hash, done
@@ -206,6 +199,20 @@ module.exports = (grunt) ->
         grunt.log.ok "Got diff for #{path.yellow} #{diff.upload.length.toString().green} #{diff.rm.length.toString().red} #{diff.rmDir.length.toString().cyan}"
         grunt.log.debug "Diff", util.inspect(diff)
         callback(diff)
+
+    touchRecursive: (path, callback) ->
+      segments = path.split(Path.sep)
+      step     = []
+      commands = []
+
+      for segment in segments when segment.length > 0
+        do (segment) =>
+          step.push segment
+          localPath = step.join Path.sep
+          commands.push (done) => @touch localPath, done
+
+      async.parallel commands, callback
+
 
     touch: (path, callback) ->
       grunt.log.debug "Touch", util.inspect(path)
