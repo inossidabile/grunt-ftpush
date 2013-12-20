@@ -54,7 +54,9 @@ ftpush: {
     src: 'path/to/source/folder',
     dest: '/path/to/destination/folder',
     exclusions: ['path/to/source/folder/**/.DS_Store', 'path/to/source/folder/**/Thumbs.db', 'dist/tmp'],
-    keep: ['/important/images/at/server/*.jpg']
+    keep: ['/important/images/at/server/*.jpg'],
+    simple: false,
+    useList: false
   }
 }
 ```
@@ -69,6 +71,7 @@ The possible parameters of the configuration are:
 - **exclusions** - an optional parameter allowing us to exclude files and folders by utilizing grunt's support for `minimatch`. Please note that the definitions should be relative to the project root
 - **keep** - an array of paths that should be kept on the server even when they are not presented locally. The definitions should be relative to `dest`.
 - **simple** - if set to `true`, task will upload modified files and quit, it will NOT remove redundant files and directories at the server side.
+- **useList** - if set to `true`, FTP client will be enforced to use LIST command instead of STAT (that is not supported by some of servers)
 
 ## Options
 
