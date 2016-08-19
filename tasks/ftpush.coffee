@@ -24,6 +24,7 @@ module.exports = (grunt) ->
     credentials = if @data.auth.authKey then auth(@data.auth.authKey) else auth(@data.auth.host)
     exclusions  = @data.exclusions || []
     keep        = @data.keep || []
+    cachePath = @data.cachePath || Path.join(".grunt", "ftpush", "#{@target}.json")   
     options     =
       useList: !!@data.useList
       remove:  !(grunt.option('simple') || @data.simple)
@@ -33,7 +34,7 @@ module.exports = (grunt) ->
     sync = new Synchronizer(
       localRoot,
       remoteRoot,
-      Path.join(".grunt", "ftpush", "#{@target}.json"),
+      cachePath,
       Object.merge(@data.auth, credentials),
       exclusions,
       keep,
